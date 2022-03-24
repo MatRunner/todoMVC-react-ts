@@ -11,11 +11,8 @@ const FILTER_TITLES = {
   [SHOW_ACTIVE]: 'Active',
   [SHOW_COMPLETED]: 'Completed'
 };
-// type Filter = {
-//   [SHOW_ALL]: 'All',
-//   [SHOW_ACTIVE]: 'Active',
-//   [SHOW_COMPLETED]: 'Completed'
-// };
+// 只能写字面量不能写引用变量？
+type Filter = 'show_all' | 'show_completed' | 'show_active'
 
 interface FooterProps {
   completedCount: number;
@@ -37,7 +34,7 @@ function Footer(props: FooterProps) {
     );
   }
 
-  const renderFilterLink = (filter) => {
+  const renderFilterLink = (filter: Filter) => {
     // 此处对filter的限制暂时没有想到更好的写法
     const title = FILTER_TITLES[filter];
     const { filter: selectedFilter, onShow } = props;
@@ -67,7 +64,7 @@ function Footer(props: FooterProps) {
     <footer className="footer">
       {renderTodoCount()}
       <ul className="filters">
-        {[SHOW_ALL, SHOW_ACTIVE, SHOW_COMPLETED].map((filter) =>
+        {([SHOW_ALL, SHOW_ACTIVE, SHOW_COMPLETED] as Filter[]).map((filter) =>
           <li key={filter}>
             {renderFilterLink(filter)}
           </li>

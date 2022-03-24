@@ -1,16 +1,20 @@
+import { useState } from 'react';
 import { Todo } from '../todos/model';
-import TodoItem from './TodoItem';
-import Footer from './Footer';
+import TodoItem from './todoItem';
+import Footer from './footer';
 import {
   SHOW_ALL,
   SHOW_COMPLETED,
   SHOW_ACTIVE
-} from '../constants/TodoFilters';
-
+} from '../todos/todoFilters';
+// ts只做静态检查，导入的值判断不出类型，我目前想到的只能是这么声明一下
+const show_all: string = SHOW_ALL
+const show_completed: string = SHOW_COMPLETED
+const show_active: string = SHOW_ACTIVE
 const TODO_FILTERS = {
-  [SHOW_ALL]: () => true,
-  [SHOW_ACTIVE]: todo => !todo.completed,
-  [SHOW_COMPLETED]: todo => todo.completed
+  [show_all]: () => true,
+  [show_completed]: (todo: Todo) => !todo.completed,
+  [show_active]: (todo: Todo) => todo.completed
 };
 
 interface MainSectionProps {
@@ -21,29 +25,22 @@ interface MainSectionProps {
   completeTodo: (todo: Todo) => void;
   deleteTodo: (todo: Todo) => void;
 };
-interface MainSectionState {
-  filter: string;
-};
 
-class MainSection extends React.Component<MainSectionProps, MainSectionState> {
-  constructor(props, context) {
-    super(props, context);
-    this.state = { filter: SHOW_ALL };
-  }
-
-  handleClearCompleted() {
-    const atLeastOneCompleted = this.props.todos.some(todo => todo.completed);
+function MainSection(props: MainSectionProps) {
+  const { todos, clearCompleted, completeAll, editTodo, completeTodo, deleteTodo } = props
+  const [filter, setFilter] = useState<string>(SHOW_ALL)
+  const filteredTodos = todos.filter(TODO_FILTERS[filter]);
+  const completedCount = todos.reduce((count: number, todo): number =>
+    todo.completed ? count + 1 : count,
+    0
+  );
+  const handleClearCompleted = () => {
+    const atLeastOneCompleted = todos.some(todo => todo.completed);
     if (atLeastOneCompleted) {
-      this.props.clearCompleted();
+      clearCompleted();
     }
   }
-
-  handleShow(filter) {
-    this.setState({ filter });
-  }
-
-  renderToggleAll(completedCount) {
-    const { todos, completeAll } = this.props;
+  const renderToggleAll = (completedCount: number) => {
     if (todos.length > 0) {
       return (
         <input className="toggle-all"
@@ -53,10 +50,7 @@ class MainSection extends React.Component<MainSectionProps, MainSectionState> {
       );
     }
   }
-
-  renderFooter(completedCount) {
-    const { todos } = this.props;
-    const { filter } = this.state;
+  const renderFooter = (completedCount: number) => {
     const activeCount = todos.length - completedCount;
 
     if (todos.length) {
@@ -64,39 +58,28 @@ class MainSection extends React.Component<MainSectionProps, MainSectionState> {
         <Footer completedCount={completedCount}
           activeCount={activeCount}
           filter={filter}
-          onClearCompleted={this.handleClearCompleted.bind(this)}
-          onShow={this.handleShow.bind(this)} />
+          onClearCompleted={handleClearCompleted}
+          onShow={filter => setFilter(filter)} />
       );
     }
   }
-
-  render() {
-    const { todos, completeTodo, deleteTodo, editTodo } = this.props;
-    const { filter } = this.state;
-
-    const filteredTodos = todos.filter(TODO_FILTERS[filter]);
-    const completedCount = todos.reduce((count: number, todo): number =>
-      todo.completed ? count + 1 : count,
-      0
-    );
-
-    return (
-      <section className="main">
-        {this.renderToggleAll(completedCount)}
-        <ul className="todo-list">
-          {filteredTodos.map(todo =>
-            <TodoItem
-              key={todo.id}
-              todo={todo}
-              editTodo={editTodo}
-              completeTodo={completeTodo}
-              deleteTodo={deleteTodo} />
-          )}
-        </ul>
-        {this.renderFooter(completedCount)}
-      </section>
-    );
-  }
+  return (
+    <section className="main">
+      {renderToggleAll(completedCount)}
+      <ul className="todo-list">
+        {filteredTodos.map(todo =>
+          <TodoItem
+            key={todo.id}
+            todo={todo}
+            editTodo={editTodo}
+            completeTodo={completeTodo}
+            deleteTodo={deleteTodo} />
+        )}
+      </ul>
+      {renderFooter(completedCount)}
+    </section>
+  )
 }
+
 
 export default MainSection;

@@ -12,33 +12,29 @@ import {
   completeTodo,
   deleteTodo
 } from './component';
-// import $ from './component'
-
+import { Todo } from './todos/model';
 interface AppProps {
   todos: model.Todo[];
-  dispatch: Dispatch<{}>;
+  dispatch: Dispatch;
 }
 
-class App extends React.Component<AppProps> {
-  render() {
-    const { todos, dispatch } = this.props;
-
-    return (
-      <div className="todoapp">
-        <Header addTodo={(text: string) => dispatch(addTodo(text))} />
-        <MainSection
-          todos={todos}
-          editTodo={(t, s) => dispatch(editTodo(t, s))}
-          deleteTodo={(t: model.Todo) => dispatch(deleteTodo(t))}
-          completeTodo={(t: model.Todo) => dispatch(completeTodo(t))}
-          clearCompleted={() => dispatch(clearCompleted())}
-          completeAll={() => dispatch(completeAll())} />
-      </div>
-    );
-  }
+function App(props: AppProps) {
+  const { todos, dispatch } = props
+  return (
+    <div className="todoapp">
+      <Header addTodo={(text: string) => dispatch(addTodo(text))} />
+      <MainSection
+        todos={todos}
+        editTodo={(t, s) => dispatch(editTodo(t, s))}
+        deleteTodo={(t: model.Todo) => dispatch(deleteTodo(t))}
+        completeTodo={(t: model.Todo) => dispatch(completeTodo(t))}
+        clearCompleted={() => dispatch(clearCompleted())}
+        completeAll={() => dispatch(completeAll())} />
+    </div>
+  )
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state: AppProps) => ({
   todos: state.todos
 });
 

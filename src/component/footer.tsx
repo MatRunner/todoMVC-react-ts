@@ -3,7 +3,8 @@ import classNames from 'classnames';
 import {
   SHOW_ALL,
   SHOW_COMPLETED,
-  SHOW_ACTIVE
+  SHOW_ACTIVE,
+  ModelFilter
 } from '../todos/todoFilters';
 
 const FILTER_TITLES = {
@@ -11,8 +12,6 @@ const FILTER_TITLES = {
   [SHOW_ACTIVE]: 'Active',
   [SHOW_COMPLETED]: 'Completed'
 };
-// 只能写字面量不能写引用变量？
-type Filter = 'show_all' | 'show_completed' | 'show_active'
 
 interface FooterProps {
   completedCount: number;
@@ -34,7 +33,7 @@ function Footer(props: FooterProps) {
     );
   }
 
-  const renderFilterLink = (filter: Filter) => {
+  const renderFilterLink = (filter: ModelFilter) => {
     // 此处对filter的限制暂时没有想到更好的写法
     const title = FILTER_TITLES[filter];
     const { filter: selectedFilter, onShow } = props;
@@ -64,7 +63,7 @@ function Footer(props: FooterProps) {
     <footer className="footer">
       {renderTodoCount()}
       <ul className="filters">
-        {([SHOW_ALL, SHOW_ACTIVE, SHOW_COMPLETED] as Filter[]).map((filter) =>
+        {([SHOW_ALL, SHOW_ACTIVE, SHOW_COMPLETED] as ModelFilter[]).map((filter) =>
           <li key={filter}>
             {renderFilterLink(filter)}
           </li>
